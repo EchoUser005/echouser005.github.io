@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>ICTIO 框架：工程化提示词设计思路 | Echo&#39;s Blog</title>
+<meta name="keywords" content="Prompt Engineering, 最佳实践, 框架设计, 工程化">
+<meta name="description" content="提示词没有系统思路？用 ICTIO 框架快速组织结构、加快迭代、降低维护成本。">
+<meta name="author" content="">
+<link rel="canonical" href="https://echouser005.github.io/posts/my-first-post/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://echouser005.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://echouser005.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://echouser005.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://echouser005.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://echouser005.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://echouser005.github.io/posts/my-first-post/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://echouser005.github.io/posts/my-first-post/">
+  <meta property="og:site_name" content="Echo&#39;s Blog">
+  <meta property="og:title" content="ICTIO 框架：工程化提示词设计思路">
+  <meta property="og:description" content="提示词没有系统思路？用 ICTIO 框架快速组织结构、加快迭代、降低维护成本。">
+  <meta property="og:locale" content="zh-cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-01-03T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-01-03T00:00:00+00:00">
+    <meta property="article:tag" content="Prompt Engineering">
+    <meta property="article:tag" content="最佳实践">
+    <meta property="article:tag" content="框架设计">
+    <meta property="article:tag" content="工程化">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ICTIO 框架：工程化提示词设计思路">
+<meta name="twitter:description" content="提示词没有系统思路？用 ICTIO 框架快速组织结构、加快迭代、降低维护成本。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://echouser005.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "ICTIO 框架：工程化提示词设计思路",
+      "item": "https://echouser005.github.io/posts/my-first-post/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "ICTIO 框架：工程化提示词设计思路",
+  "name": "ICTIO 框架：工程化提示词设计思路",
+  "description": "提示词没有系统思路？用 ICTIO 框架快速组织结构、加快迭代、降低维护成本。",
+  "keywords": [
+    "Prompt Engineering", "最佳实践", "框架设计", "工程化"
+  ],
+  "articleBody": "写提示词最常见的问题是：没有系统思路，堆砌各种需求，最后结构混乱、难以调整。经过多个项目的实践，我总结出了 ICTIO 框架——一套工程化的提示词设计方法。它的核心思想很简单：用五个层次的 Block 来组织提示词，按照任务类型选择必需的层次，避免过度设计。\n这个框架的作用不在于追求某个特定指标，而在于让提示词写得有结构、快速填充内容、容易迭代。\n这篇文章分享三个内容：框架的五个 Block 层次，六种常见任务的最小化配置，以及设计时应该遵循的原则。\n五层 Block 定义 Instruction - 任务目标与执行逻辑\n定义做什么、怎么做。是提示词的核心逻辑层，所有任务都必需。\nContext - 上下文信息与已有数据\n存放历史记录、用户信息、参数列表、背景知识等实际数据。需要时添加。\nTools - 工具调用规范\n定义可用工具、参数说明、返回值格式。仅当任务涉及工具调用时需要。\nInput - 入参定义\n明确输入的格式、字段、约束。当需要严格定义输入时添加。\nOutput - 出参格式与约束\n规定输出的结构、长度、风格。几乎所有任务都需要。\n按任务类型配置 参数提取\n必需：Instruction + Context + Input + Output\n特点：单轮交互，直接提取参数并调用工具，无对话轮次\n示例：从用户请求中提取目标城市、出发日期等参数\n意图分类 / 实体抽取\n必需：Instruction + Input + Output\n可选：Context（分类标签集合或上下文约束）\n特点：识别和提取，不涉及工具调用，纯文本理解\n角色扮演 / 文本生成\n必需：Instruction + Output\n可选：Context（用户偏好、写作风格、约束条件）\n特点：内容生成，格式或风格约束，无需工具\nAgent Chatbot（带工具执行能力）\n必需：Instruction + Context + Tools + Input + Output\n特点：多轮对话，执行工具调用，有状态管理，最复杂的配置\n知识库问答 / 检索增强\n必需：Instruction + Context + Output\n可选：Input（显式定义查询格式）\n特点：基于已有知识或召回内容生成回答\n复杂决策 / 推理\n必需：Instruction + Context + Output\n特点：多因素权衡，需要明确推理过程\n示例：出行服务 Agent Prompt system_prompt = \"\"\" # instruction 你是出行服务助手，始终使用 `{{language}}` 语言来帮助用户完成当前的出行预订服务。 ## workflow 1. 理解用户当前的出行需求，识别到用户出发地和目的地。 2. 获取到出发地和目的地的坐标后调用预估价格工具尝试获取预估信息。 3. 从预估结果列表选择满足用户需求的车型，调用生成预订链接的工具。 4. 预订链接生成成功只需要回复用户正在帮他处理中。 ## strategies ### 地点完整性 1. 当用户没明确说出发地点，直接使用当前位置作为出发地。使用 get_location 获取当前位置坐标。 2. 当用户出发地属于 POI 周边类型，且明确要求最近的 POI 地点，那么使用 maps_place_around 工具获取距离用户出发地最近的坐标作为目的地。若无明确最近要求，需反问用户澄清更具体的目的地地址。 3. 当用户出发地明确，使用 maps_textsearch 工具搜索最符合用户需求的一条作为目的地坐标，除非真的有必要反问（如多个结果距离相差过远）否则尽量直接决定一个目的地坐标。 ### 车型选择 1. 使用用户指定车型，未明确时直接选择用户偏好的车型，若无偏好直接选择标准车型。 2. 若预估结果中没有满足用户偏好的车型，没有价格要求的情况下直接选择标准车型生成预订链接。 3. 用户有偏好设置时，没有特别要求就直接生成偏好车型链接，如果你对一些关键偏好信息不太确定，也可以生成链接后补充告知用户还可以换其他车型。 ### 价格限制 1. 如果用户对预算有要求，识别用户对预算的显式（如\"不要超过50元\"）和隐式（如\"最便宜的\"）的要求，仔细按照预估结果返回的信息比对用户的需求，选出最适合用户的车型。 2. 如果预估结果不满足用户对预算的要求，则简要告知用户没有满足用户要求的车型，抛出可用车型和价格。 ## rules 1. 用平等、直接的对话方式，就像和朋友自然地确认信息。不需要过多解释，直接说重点，用日常对话的语气和句式。不要输出用户不关心的技术语言。 2. 只有在关键信息真正缺失时才进行追问，尽可能通过已知信息推断出发地和目的地直接生成预订链接。 3. 若遇到网络异常工具重试 2 次仍调用失败，则委婉致歉提醒用户网络原因导致当前服务暂时不可用，请用户稍后再试。 4. 你只能生成预订链接让用户自己去选择链接，不可直接下单。 # context 用户常用地址：{{saved_locations}} 默认车型偏好：{{vehicle_preference}} 用户所在城市：{{ip_location}} \"\"\" user_prompt = \"\"\" 对话历史记录： {{conversation_history}} 用户当前问题： {{user_query}} \"\"\" 工程化设计的四个原则 1. 最小化原则 只加必需的 Block，不要过度设计。参数提取不需要 Tools，意图分类不需要 Context，这样做有两个好处：\n其一是减少模型的处理负担。冗余的信息会分散注意力，降低模型对核心指令的理解。\n其二是便于快速迭代。Block 越少，改动越直接，反馈周期越快。这对早期探索很重要。\n2. 分工清晰 每个 Block 只做一件事。Context 放数据，Instruction 放逻辑，Tools 放接口说明，Output 放格式约束。\n分工模糊是提示词难以维护的主要原因。当逻辑和数据混在一起，改某个参数可能意外影响其他行为。好的分工结构让即使是非技术人员也能理解提示词的各部分职责。\n3. 占位符优先，策略优先 用占位符而非硬编码。 采用 {{language}}、{{user_query}}、{{history}} 等占位符，让提示词可复用且参数化。不要写死具体的值。\n用策略描述而非硬编码句子。 这是最常见的错误。\n反面做法：写死完整句子：\n\"当前服务崩溃，暂时无法为你返回结果。抱歉给您带来不便。\" 该做法的问题是无法随语言变化。用户语言为英语时，该句子还是中文。\n正确做法：以策略描述要求：\n\"工具调用异常时用 {{language}} 语言给出一句简洁友好的错误提示。\" 这样模型可以根据实际参数自动生成符合要求的表达。\n核心区别：硬编码是固定表述，策略是方向性指导。\n4. 抽象但精准的指令 指令的核心矛盾是：过于具体会限制模型，过于抽象会失去方向。关键是找到这个平衡点。\n三个常见的误区：\n过于具体化。当你规定了太多\"如何做\"而非\"完成什么\"时，模型被框死了。新情况、边界情况、组合情况它都无法应对。这样的指令看起来全面，实际上很脆弱。\n缺乏统一性。一些指令是\"直接做\"，一些是\"先判断再做\"，一些是\"遇到问题就反问\"。没有形成一致的行为准则，模型很容易在优先级判断上出错。\n表述冗余。用很多词说同一件事，或者用多个相似的例子去重复强调一个原则。这增加了提示词的体积，反而分散了核心要求的注意力。\n平衡的做法：\n指令应该始终指向目标终点，而不是路径。告诉模型要完成什么，给出判断的原则，但不要把所有可能的路全部铺出来。\n既要用明确的规则堵上已知的漏洞（比如上方 Agent Prompt 示例中的\"网络异常重试2次\"），又要保持足够的灵活性，让模型能处理未知的、复杂的情况。\n这就是柔中带刚——关键节点清晰无歧义，边界条件既有原则又不过拟合。规则应该像一个方向灯而不是一堵墙。\n实战启发 最小化配置带来的好处。 只写必需的 Block 听起来简单，但在实际操作中很容易破坏。团队成员会想加额外的约束、背景信息、示例，这些都是出于好意。关键是要有定力——识别真正的需求，拒绝不必要的冗余。\n分工清晰的力量。 提示词代码化后，分工清晰变得容易追踪问题。比如参数提取准确率不够，可以快速定位是 Instruction 的逻辑问题、Input 的定义不清、还是 Output 的约束冲突。不清晰的提示词时常让你不知道改什么才能改对。\n文档化本身就是优化。 把提示词用 Block 组织后，它变成了可读的、可维护的代码。新成员能快速理解，Code Review 时也能指出问题。这本身就提升了质量。\n总结 ICTIO 框架本质上是提示词工程化的一套标准化方法。它不追求某个特定的性能指标，而是提供结构、加快迭代、降低维护成本。\n五个 Block 层次提供了足够的灵活性，六种常见任务的最小化配置让你不用每次都从零开始思考。四个设计原则确保提示词写得清晰、可复用、易维护。\n对于任何涉及多个提示词版本迭代、多人协作的项目，这套方法都有直接的价值。\n",
+  "wordCount" : "249",
+  "inLanguage": "en",
+  "datePublished": "2026-01-03T00:00:00Z",
+  "dateModified": "2026-01-03T00:00:00Z",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://echouser005.github.io/posts/my-first-post/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Echo's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://echouser005.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://echouser005.github.io/" accesskey="h" title="Echo&#39;s Blog (Alt + H)">Echo&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      ICTIO 框架：工程化提示词设计思路
+    </h1>
+    <div class="post-description">
+      提示词没有系统思路？用 ICTIO 框架快速组织结构、加快迭代、降低维护成本。
+    </div>
+    <div class="post-meta"><span title='2026-01-03 00:00:00 +0000 UTC'>January 3, 2026</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>写提示词最常见的问题是：没有系统思路，堆砌各种需求，最后结构混乱、难以调整。经过多个项目的实践，我总结出了 ICTIO 框架——一套工程化的提示词设计方法。它的核心思想很简单：用五个层次的 Block 来组织提示词，按照任务类型选择必需的层次，避免过度设计。</p>
+<p>这个框架的作用不在于追求某个特定指标，而在于让提示词写得有结构、快速填充内容、容易迭代。</p>
+<p>这篇文章分享三个内容：框架的五个 Block 层次，六种常见任务的最小化配置，以及设计时应该遵循的原则。</p>
+<h2 id="五层-block-定义">五层 Block 定义<a hidden class="anchor" aria-hidden="true" href="#五层-block-定义">#</a></h2>
+<p><strong>Instruction</strong> - 任务目标与执行逻辑<br>
+定义做什么、怎么做。是提示词的核心逻辑层，所有任务都必需。</p>
+<p><strong>Context</strong> - 上下文信息与已有数据<br>
+存放历史记录、用户信息、参数列表、背景知识等实际数据。需要时添加。</p>
+<p><strong>Tools</strong> - 工具调用规范<br>
+定义可用工具、参数说明、返回值格式。仅当任务涉及工具调用时需要。</p>
+<p><strong>Input</strong> - 入参定义<br>
+明确输入的格式、字段、约束。当需要严格定义输入时添加。</p>
+<p><strong>Output</strong> - 出参格式与约束<br>
+规定输出的结构、长度、风格。几乎所有任务都需要。</p>
+<h2 id="按任务类型配置">按任务类型配置<a hidden class="anchor" aria-hidden="true" href="#按任务类型配置">#</a></h2>
+<p><strong>参数提取</strong><br>
+必需：Instruction + Context + Input + Output<br>
+特点：单轮交互，直接提取参数并调用工具，无对话轮次<br>
+示例：从用户请求中提取目标城市、出发日期等参数</p>
+<p><strong>意图分类 / 实体抽取</strong><br>
+必需：Instruction + Input + Output<br>
+可选：Context（分类标签集合或上下文约束）<br>
+特点：识别和提取，不涉及工具调用，纯文本理解</p>
+<p><strong>角色扮演 / 文本生成</strong><br>
+必需：Instruction + Output<br>
+可选：Context（用户偏好、写作风格、约束条件）<br>
+特点：内容生成，格式或风格约束，无需工具</p>
+<p><strong>Agent Chatbot（带工具执行能力）</strong><br>
+必需：Instruction + Context + Tools + Input + Output<br>
+特点：多轮对话，执行工具调用，有状态管理，最复杂的配置</p>
+<p><strong>知识库问答 / 检索增强</strong><br>
+必需：Instruction + Context + Output<br>
+可选：Input（显式定义查询格式）<br>
+特点：基于已有知识或召回内容生成回答</p>
+<p><strong>复杂决策 / 推理</strong><br>
+必需：Instruction + Context + Output<br>
+特点：多因素权衡，需要明确推理过程</p>
+<h2 id="示例出行服务-agent-prompt">示例：出行服务 Agent Prompt<a hidden class="anchor" aria-hidden="true" href="#示例出行服务-agent-prompt">#</a></h2>
+<pre tabindex="0"><code>system_prompt = &#34;&#34;&#34;
+# instruction
+
+你是出行服务助手，始终使用 `{{language}}` 语言来帮助用户完成当前的出行预订服务。
+
+## workflow
+1. 理解用户当前的出行需求，识别到用户出发地和目的地。
+2. 获取到出发地和目的地的坐标后调用预估价格工具尝试获取预估信息。
+3. 从预估结果列表选择满足用户需求的车型，调用生成预订链接的工具。
+4. 预订链接生成成功只需要回复用户正在帮他处理中。
+
+## strategies
+
+### 地点完整性
+1. 当用户没明确说出发地点，直接使用当前位置作为出发地。使用 get_location 获取当前位置坐标。
+2. 当用户出发地属于 POI 周边类型，且明确要求最近的 POI 地点，那么使用 maps_place_around 工具获取距离用户出发地最近的坐标作为目的地。若无明确最近要求，需反问用户澄清更具体的目的地地址。
+3. 当用户出发地明确，使用 maps_textsearch 工具搜索最符合用户需求的一条作为目的地坐标，除非真的有必要反问（如多个结果距离相差过远）否则尽量直接决定一个目的地坐标。
+
+### 车型选择
+1. 使用用户指定车型，未明确时直接选择用户偏好的车型，若无偏好直接选择标准车型。
+2. 若预估结果中没有满足用户偏好的车型，没有价格要求的情况下直接选择标准车型生成预订链接。
+3. 用户有偏好设置时，没有特别要求就直接生成偏好车型链接，如果你对一些关键偏好信息不太确定，也可以生成链接后补充告知用户还可以换其他车型。
+
+### 价格限制
+1. 如果用户对预算有要求，识别用户对预算的显式（如&#34;不要超过50元&#34;）和隐式（如&#34;最便宜的&#34;）的要求，仔细按照预估结果返回的信息比对用户的需求，选出最适合用户的车型。
+2. 如果预估结果不满足用户对预算的要求，则简要告知用户没有满足用户要求的车型，抛出可用车型和价格。
+
+## rules
+1. 用平等、直接的对话方式，就像和朋友自然地确认信息。不需要过多解释，直接说重点，用日常对话的语气和句式。不要输出用户不关心的技术语言。
+2. 只有在关键信息真正缺失时才进行追问，尽可能通过已知信息推断出发地和目的地直接生成预订链接。
+3. 若遇到网络异常工具重试 2 次仍调用失败，则委婉致歉提醒用户网络原因导致当前服务暂时不可用，请用户稍后再试。
+4. 你只能生成预订链接让用户自己去选择链接，不可直接下单。
+
+# context
+
+用户常用地址：{{saved_locations}}
+默认车型偏好：{{vehicle_preference}}
+用户所在城市：{{ip_location}}
+&#34;&#34;&#34;
+
+user_prompt = &#34;&#34;&#34;
+对话历史记录：
+{{conversation_history}}
+
+用户当前问题：
+{{user_query}}
+&#34;&#34;&#34;
+</code></pre><h2 id="工程化设计的四个原则">工程化设计的四个原则<a hidden class="anchor" aria-hidden="true" href="#工程化设计的四个原则">#</a></h2>
+<h3 id="1-最小化原则">1. 最小化原则<a hidden class="anchor" aria-hidden="true" href="#1-最小化原则">#</a></h3>
+<p>只加必需的 Block，不要过度设计。参数提取不需要 Tools，意图分类不需要 Context，这样做有两个好处：</p>
+<p>其一是减少模型的处理负担。冗余的信息会分散注意力，降低模型对核心指令的理解。</p>
+<p>其二是便于快速迭代。Block 越少，改动越直接，反馈周期越快。这对早期探索很重要。</p>
+<h3 id="2-分工清晰">2. 分工清晰<a hidden class="anchor" aria-hidden="true" href="#2-分工清晰">#</a></h3>
+<p>每个 Block 只做一件事。Context 放数据，Instruction 放逻辑，Tools 放接口说明，Output 放格式约束。</p>
+<p>分工模糊是提示词难以维护的主要原因。当逻辑和数据混在一起，改某个参数可能意外影响其他行为。好的分工结构让即使是非技术人员也能理解提示词的各部分职责。</p>
+<h3 id="3-占位符优先策略优先">3. 占位符优先，策略优先<a hidden class="anchor" aria-hidden="true" href="#3-占位符优先策略优先">#</a></h3>
+<p><strong>用占位符而非硬编码。</strong> 采用 {{language}}、{{user_query}}、{{history}} 等占位符，让提示词可复用且参数化。不要写死具体的值。</p>
+<p><strong>用策略描述而非硬编码句子。</strong> 这是最常见的错误。</p>
+<p>反面做法：写死完整句子：</p>
+<pre tabindex="0"><code>&#34;当前服务崩溃，暂时无法为你返回结果。抱歉给您带来不便。&#34;
+</code></pre><p>该做法的问题是无法随语言变化。用户语言为英语时，该句子还是中文。</p>
+<p>正确做法：以策略描述要求：</p>
+<pre tabindex="0"><code>&#34;工具调用异常时用 {{language}} 语言给出一句简洁友好的错误提示。&#34;
+</code></pre><p>这样模型可以根据实际参数自动生成符合要求的表达。</p>
+<p>核心区别：硬编码是固定表述，策略是方向性指导。</p>
+<h3 id="4-抽象但精准的指令">4. 抽象但精准的指令<a hidden class="anchor" aria-hidden="true" href="#4-抽象但精准的指令">#</a></h3>
+<p>指令的核心矛盾是：过于具体会限制模型，过于抽象会失去方向。关键是找到这个平衡点。</p>
+<p><strong>三个常见的误区：</strong></p>
+<p>过于具体化。当你规定了太多&quot;如何做&quot;而非&quot;完成什么&quot;时，模型被框死了。新情况、边界情况、组合情况它都无法应对。这样的指令看起来全面，实际上很脆弱。</p>
+<p>缺乏统一性。一些指令是&quot;直接做&quot;，一些是&quot;先判断再做&quot;，一些是&quot;遇到问题就反问&quot;。没有形成一致的行为准则，模型很容易在优先级判断上出错。</p>
+<p>表述冗余。用很多词说同一件事，或者用多个相似的例子去重复强调一个原则。这增加了提示词的体积，反而分散了核心要求的注意力。</p>
+<p><strong>平衡的做法：</strong></p>
+<p>指令应该始终指向目标终点，而不是路径。告诉模型要完成什么，给出判断的原则，但不要把所有可能的路全部铺出来。</p>
+<p>既要用明确的规则堵上已知的漏洞（比如上方 Agent Prompt 示例中的&quot;网络异常重试2次&quot;），又要保持足够的灵活性，让模型能处理未知的、复杂的情况。</p>
+<p>这就是柔中带刚——关键节点清晰无歧义，边界条件既有原则又不过拟合。规则应该像一个方向灯而不是一堵墙。</p>
+<h2 id="实战启发">实战启发<a hidden class="anchor" aria-hidden="true" href="#实战启发">#</a></h2>
+<p><strong>最小化配置带来的好处。</strong> 只写必需的 Block 听起来简单，但在实际操作中很容易破坏。团队成员会想加额外的约束、背景信息、示例，这些都是出于好意。关键是要有定力——识别真正的需求，拒绝不必要的冗余。</p>
+<p><strong>分工清晰的力量。</strong> 提示词代码化后，分工清晰变得容易追踪问题。比如参数提取准确率不够，可以快速定位是 Instruction 的逻辑问题、Input 的定义不清、还是 Output 的约束冲突。不清晰的提示词时常让你不知道改什么才能改对。</p>
+<p><strong>文档化本身就是优化。</strong> 把提示词用 Block 组织后，它变成了可读的、可维护的代码。新成员能快速理解，Code Review 时也能指出问题。这本身就提升了质量。</p>
+<h2 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h2>
+<p>ICTIO 框架本质上是提示词工程化的一套标准化方法。它不追求某个特定的性能指标，而是提供结构、加快迭代、降低维护成本。</p>
+<p>五个 Block 层次提供了足够的灵活性，六种常见任务的最小化配置让你不用每次都从零开始思考。四个设计原则确保提示词写得清晰、可复用、易维护。</p>
+<p>对于任何涉及多个提示词版本迭代、多人协作的项目，这套方法都有直接的价值。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://echouser005.github.io/tags/prompt-engineering/">Prompt Engineering</a></li>
+      <li><a href="https://echouser005.github.io/tags/%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">最佳实践</a></li>
+      <li><a href="https://echouser005.github.io/tags/%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1/">框架设计</a></li>
+      <li><a href="https://echouser005.github.io/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a></li>
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://echouser005.github.io/">Echo&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

@@ -1,7 +1,7 @@
 ---
 title: "How the ICTIO Framework Improves the Maintainability of Engineered Prompts"
 date: 2026-01-03
-slug: "my-first-post"
+slug: "how-the-ictio-framework-improves-the-maintainability-of-engineered-prompts"
 categories: ["技术"]
 tags: ["Prompt Engineering", "最佳实践", "框架设计", "工程化"]
 draft: false

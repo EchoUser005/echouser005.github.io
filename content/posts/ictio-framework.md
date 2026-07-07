@@ -1,6 +1,7 @@
 ---
-title: "ICTIO 框架：工程化提示词设计思路"
+title: "How the ICTIO Framework Improves the Maintainability of Engineered Prompts"
 date: 2026-01-03
+slug: "my-first-post"
 categories: ["技术"]
 tags: ["Prompt Engineering", "最佳实践", "框架设计", "工程化"]
 draft: false

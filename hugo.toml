@@ -1,4 +1,14 @@
 baseURL = "https://echouser005.github.io/"
 languageCode = "zh-cn"
+defaultContentLanguage = "zh"
+hasCJKLanguage = true
 title = "Echo's Blog"
 theme = "PaperMod"
+
+[params]
+  DateFormat = "2006年1月2日"
+  defaultTheme = "light"
+  disableThemeToggle = true
+
+[markup.highlight]
+  noClasses = false

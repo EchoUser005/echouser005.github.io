@@ -1,0 +1,8 @@
+{{- with resources.Get "css/echo-palette.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+{{- end -}}
+{{- if .Params.echoArticle -}}
+{{- with resources.Get "css/echo-article.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+{{- end -}}
+{{- end -}}

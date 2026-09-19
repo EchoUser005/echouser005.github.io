@@ -1,0 +1,34 @@
+:root {
+  --main-width: 790px;
+}
+.post-header { margin: 36px 0 34px; }
+.post-title { max-width: 760px; font-size: 38px; font-weight: 650; line-height: 1.45; letter-spacing: -.7px; text-wrap: balance; }
+.post-description { margin: 22px 0 18px; font-size: 17px; line-height: 1.85; color: var(--secondary); }
+.post-meta { font-size: 13px; letter-spacing: .3px; }
+.post-content { font-size: 17px; line-height: 1.95; overflow-wrap: anywhere; }
+.post-content p { margin: 0 0 22px; }
+.post-content h2 { margin: 54px 0 22px; padding-top: 22px; border-top: 1px solid var(--echo-line); font-size: 25px; line-height: 1.55; letter-spacing: -.3px; }
+.post-content h3 { margin: 36px 0 16px; font-size: 21px; line-height: 1.6; }
+.post-content strong { color: var(--echo-accent); font-weight: 650; }
+.post-content a { color: var(--echo-accent); text-decoration: underline; text-decoration-color: #d5af96; text-underline-offset: 4px; box-shadow: none; }
+.post-content blockquote { border-inline-start: 3px solid var(--echo-accent); color: var(--secondary); padding: 4px 0 4px 22px; }
+.post-content table { margin: 30px 0; font-size: 14px; line-height: 1.75; }
+.post-content table th { background: #f2e8dc; color: var(--echo-accent); font-weight: 650; }
+.post-content table td, .post-content table th { padding: 12px 14px; border-bottom: 1px solid var(--echo-line); min-width: 130px; vertical-align: top; }
+.post-content table tbody tr:nth-child(even) { background: #f6eee4; }
+.post-content img { margin: 28px auto; background: var(--theme); max-width: 100%; border-radius: 0; }
+.post-content img[src*="mermaid-"] { width: min(100%, 400px); }
+.post-content pre { border-radius: 5px; margin: 26px 0; }
+.post-content pre code { font-size: 13px; line-height: 1.8; }
+.post-content :not(pre) > code { font-size: .86em; color: var(--echo-accent); background: #f2e8dc; padding: 2px 5px; }
+.toc { border: 0; border-top: 1px solid var(--echo-line); border-bottom: 1px solid var(--echo-line); border-radius: 0; background: transparent; padding: 20px 0; margin: 30px 0; }
+.toc .inner { margin: 16px 0 0; font-size: 14px; line-height: 2; }
+@media (max-width: 600px) {
+  .post-header { margin-top: 22px; }
+  .post-title { font-size: 29px; line-height: 1.55; letter-spacing: -.4px; }
+  .post-description { font-size: 15px; }
+  .post-content { font-size: 16px; line-height: 1.9; }
+  .post-content h2 { font-size: 22px; margin-top: 42px; }
+  .post-content table { font-size: 13px; }
+  .post-content table td, .post-content table th { min-width: 124px; padding: 10px; }
+}

@@ -1,0 +1,8 @@
+.DS_Store
+.hugo_build.lock
+/public/
+/resources/_gen/
+/.publish-output/
+/publishing/node_modules/
+/publishing/vendor/
+/publishing/.cache/

@@ -28,13 +28,13 @@ Pi 发布 1.0，把 MCP 正式接进来了。[发布公告](https://earendil.com
 
 ## 从四个工具开始
 
-Pi 被更多人知道，有一条很清楚的传播路径。今年 1 月，OpenClaw 采用了 Pi，Armin Ronacher 也写文章介绍自己为什么喜欢这个小 Agent。[Armin 当时的文章](https://lucumr.pocoo.org/2026/1/31/pi/)
+今年 1 月，OpenClaw 采用了 Pi，Armin Ronacher 也写文章介绍自己为什么喜欢这个小 Agent。[Armin 当时的文章](https://lucumr.pocoo.org/2026/1/31/pi/)
 
 曝光之后，它对开发者的吸引力，还得看设计本身。早期 Pi 默认提供 `read`、`bash`、`edit`、`write` 四个工具，核心很小，同时允许使用者通过扩展增加能力。[Pi 作者的设计说明](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)
 
 模型之外的对话循环、工具执行、上下文和扩展机制，由 harness 承担。Pi 帮开发者做好这一圈基础设施，再把应用需要哪些能力，留给开发者自己决定。
 
-你可以从很少的工具开始，知道模型眼前到底有什么，再一点点增加。对需要调 prompt、磨工具描述、评测任务表现的人来说，这种可控性很重要。
+你可以从很少的工具开始，知道模型眼前到底有什么，再一点点增加。对于需要精确控制模型上下文提高任务交互表现的人来说，这种可控性很重要。
 
 ## Pi 这次改变了什么
 
@@ -44,7 +44,7 @@ Pi 官方给了一个具体例子：取出 Linear 上 167 个开放 issue 和各
 
 [![Pi 官方 167 个 issue 案例](images/asset-7ecae94e7296.png)](images/asset-7ecae94e7296.png)
 
-*图 1｜根据 [Pi 官方案例](https://earendil.com/posts/you-said-no-mcp/) 自绘。167 条讨论中，156 条被判为中性、11 条为轻度不满。*
+*图 1｜ [Pi 官方案例](https://earendil.com/posts/you-said-no-mcp/)，167 条讨论中，156 条被判为中性、11 条为轻度不满。*
 
 MCP 提供外部接口，程序负责批量处理，分类模型完成专项判断。主模型不必逐条阅读全部中间数据。
 
@@ -54,9 +54,9 @@ MCP 提供外部接口，程序负责批量处理，分类模型完成专项判�
 
 ## 工具设计背后的上下文成本
 
-我以前更愿意自己设计 toolcall schema，很少用 MCP，甚至一度觉得它一无是处。尤其是工具加载多了之后，多轮对话里的调用表现会明显下滑。增加的能力还没用上，关键任务先受了影响。
+很能理解 Pi 早期的选择，我也是以前更愿意自己设计 toolcall schema，很少用 MCP，甚至一度觉得它一无是处。尤其是工具加载多了之后，多轮对话里的调用表现会明显下滑。增加的能力还没用上，关键任务先受了影响。
 
-这也是为什么，我很能理解 Pi 早期的选择。去年 11 月，Pi 作者在[设计说明](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/#no-mcp-support)里明确反对全量前置工具定义：当前任务用不到的说明书，也会挤占上下文。
+去年 11 月，Pi 作者在[设计说明](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/#no-mcp-support)里明确反对全量前置工具定义：当前任务用不到的说明书，也会挤占上下文。
 
 同月，Anthropic 的工程文章记录了类似问题：五个 MCP server、58 个工具，仅定义就约占 55K tokens；相似工具还会增加选择和参数错误。这些顾虑，在 Pi 做出早期取舍时就已经存在。
 
@@ -82,11 +82,11 @@ MCP 提供外部接口，程序负责批量处理，分类模型完成专项判�
 
 ## 从自建工具到复用外部能力
 
-工具越多越好，我不认同。工具越少越好，我现在也不会轻易下这个结论。
+毋庸置疑工具对模型任务表现而言不是越多越好，但工具设计是否应该遵循"less is more"，也不能妄下定论。
 
-因为做着做着，我遇到了另一类问题。真实业务需要的外部能力越来越多，而我考虑得更多的是模型的决策边界、工具的可插拔替换，以及长期可维护性。领域能力的开发者，则更关注功能本身是否完整、可靠。两边需要分工协作，我不可能为了统一这些工程细节，就把领域能力也全部亲自开发、维护一遍。
+我们会发现真实业务Agent需要的外部能力越来越多，而harness维护者考虑得更多的是模型的决策边界、工具的可插拔替换，以及长期可维护性。领域能力的开发者，则更关注功能本身是否完整、可靠。两边需要分工协作，我们不可能为了统一这些工程细节，就把领域能力也全部亲自开发、维护一遍。
 
-之前对 MCP 的判断，把两件事混在了一起。一件是模型每一步应该看到多少工具，另一件是别人开发的能力，怎样交给 Agent 使用。
+之前对 MCP 的判断，我们可能是把两件事混在了一起。一个是模型每一步应该看到多少工具，另一个则是别人开发的能力，怎样交给 Agent 正确使用。
 
 第一件事，仍然要认真控制。第二件事，可以交给共同协议。客户端取得 MCP 工具目录之后，仍能决定向模型提供哪些定义；协议并没有要求把全部工具一次性放进上下文。[MCP 工具规范](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
 
@@ -98,7 +98,7 @@ MCP 提供外部接口，程序负责批量处理，分类模型完成专项判�
 
 说个题外话，端侧能力也可以沿着这个思路接入。虽然 MCP 当前的标准传输主要是 stdio 和 Streamable HTTP，但它也允许自定义传输。[MCP 传输规范](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)
 
-小智 ESP32 开源项目就为 MCP 做了 WebSocket／MQTT 传输封装。工具注册在设备上，设备通过 WebSocket 或 MQTT 连接后端，后端发现工具，再发起调用。设备提供工具，因此在 MCP 的角色里仍然是 server。
+小智 ESP32 开源项目就为 MCP 做了WebSocket／MQTT 传输封装。工具注册在设备上，设备通过WebSocket 或 MQTT 连接后端，后端发现工具，再发起调用。设备提供工具，因此在 MCP 的角色里仍然是 server。
 
 [![小智端侧 MCP 的连接和调用](images/asset-932c63be5328.png)](images/asset-932c63be5328.png)
 
@@ -110,6 +110,30 @@ MCP 提供外部接口，程序负责批量处理，分类模型完成专项判�
 
 ## 能力接入之后
 
-能力接进来了，上下文的污染和浪费依然存在。Pi 的编程与工具编排场景，让 Codemode 成为一条自然的路径：把中间处理留在执行环境，再返回必要结果。
+MCP可以接，上下文的污染和浪费可不会消失。Pi 借助Codemode，把工具调用和中间处理交给程序，缓解主模型的上下文负担。但换到其他垂直行业，我们也需要引入一层代码编排吗？
 
-换到低延迟交互、端侧小模型或其他行业任务，又该怎样处理工具膨胀与多轮 context rot？我想下次专题聊聊多工具落地的方案取舍。
+换到低延迟交互、端侧小模型或其他行业任务，又有什么轻量方案处理工具膨胀与多轮 context rot？
+
+我想下次结合自己的工程实践展开探讨：
+
+什么样的设计思路，能帮助我们厘清那些模糊、难以说清的模型决策边界，也更容易被不同领域理解和借鉴？
+
+## 参考资料
+
+- [Pi 1.0：发布公告](https://earendil.com/posts/pi-1-0/)
+
+- [You Said No MCP：Pi 接纳 MCP 的官方解释](https://earendil.com/posts/you-said-no-mcp/)
+
+- [Pi 作者：极简 Agent 的设计取舍](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/)
+
+- [Anthropic：Advanced Tool Use](https://www.anthropic.com/engineering/advanced-tool-use)
+
+- [ComplexMCP：Evaluation of LLM Agents in Dynamic, Interdependent, and Large-Scale Tool Sandbox](https://arxiv.org/html/2605.10787#S4.F6)
+
+- [WildToolBench：Benchmarking LLM Tool-Use in the Wild](https://arxiv.org/html/2604.06185v1)
+
+- [MCP 官方规范：Tools](https://modelcontextprotocol.io/specification/2026-07-28/server/tools)
+
+- [MCP 官方规范：Transports](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)
+
+- [小智 ESP32：MCP 工具使用与设备接入](https://github.com/78/xiaozhi-esp32/blob/main/docs/mcp-usage.md)

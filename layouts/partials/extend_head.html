@@ -6,3 +6,9 @@
 <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
 {{- end -}}
 {{- end -}}
+
+{{- if .Params.echoFigureCaptions -}}
+{{- with resources.Get "css/echo-figures.css" | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+{{- end -}}
+{{- end -}}
